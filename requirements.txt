@@ -1,3 +1,4 @@
 bcrypt
 passlib
 zeroc-ice
+sqlalchemy

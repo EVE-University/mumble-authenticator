@@ -1,0 +1,19 @@
+# Ice configuration
+ice:
+  host: 127.0.0.1
+  port: 6502
+  secret:
+  watchdog: 30
+
+# Murmur configuration
+murmur:
+  servers: # Virtual server authenticator definition
+    # Applies to all servers not specifically defined
+    default:
+      id_offset: 1000000000
+      reject_on_error: true
+      auth_class: mumble_authenticator.allianceauth.Authenticator
+      conf:
+        database_url: mysql://user:password@localhost/dbname
+
+  default_conf: default # Sets the default server config name
