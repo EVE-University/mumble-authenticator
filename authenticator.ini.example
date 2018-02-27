@@ -26,8 +26,8 @@ watchdog        = 30
 
 ;Murmur configuration
 [murmur]
-;List of virtual server IDs, empty = all
-servers      = 
+;List of virtual server IDs
+servers      = 1
 
 ;Logging configuration
 [log]
