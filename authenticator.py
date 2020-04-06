@@ -521,12 +521,12 @@ def do_main_program():
             if name == 'SuperUser':
                 debug('Forced fall through for SuperUser')
                 return (FALL_THROUGH, None, None)
-
+            
+            # find the user
             try:
                 sql = 'SELECT user_id, pwhash, groups, hashfn ' \
                       'FROM %smumble_mumbleuser ' \
                       'WHERE username = %%s' % cfg.database.prefix
-
                 cur = threadDB.execute(sql, [name])
             except threadDbException:
                 return (FALL_THROUGH, None, None)
@@ -536,8 +536,27 @@ def do_main_program():
             if not res:
                 info('Fall through for unknown user "%s"', name)
                 return (FALL_THROUGH, None, None)
-
+            
+            # breakout the data
             uid, upwhash, ugroups, uhashfn = res
+            
+            # check for display name
+            try:
+                sql = 'SELECT display_name, user_id ' \
+                      'FROM %smumble_mumbleuser ' \
+                      'WHERE username = %%s' % cfg.database.prefix
+                cur = threadDB.execute(sql, [name])
+                res = cur.fetchone()
+                cur.close()
+                if res:
+                    display_name, uid = res
+                    if not display_name:
+                        display_name = name
+                else:
+                    display_name = name
+            except threadDbException:
+                error('Please Update and Migrate Alliance Auth! Database Version incorect!')
+                display_name = name
 
             if ugroups:
                 groups = ugroups.split(',')
@@ -547,9 +566,9 @@ def do_main_program():
             debug('checking password with hash function: %s' % uhashfn)
 
             if allianceauth_check_hash(pw, upwhash, uhashfn):
-                info('User authenticated: "%s" (%d)', name, uid + cfg.user.id_offset)
+                info('User authenticated: "%s" (%d)', display_name, uid + cfg.user.id_offset)
                 debug('Group memberships: %s', str(groups))
-                return (uid + cfg.user.id_offset, entity_decode(name), groups)
+                return (uid + cfg.user.id_offset, entity_decode(display_name), groups)
 
             info('Failed authentication attempt for user: "%s" (%d)', name, uid + cfg.user.id_offset)
             return (AUTH_REFUSED, None, None)
