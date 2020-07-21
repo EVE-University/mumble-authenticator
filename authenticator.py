@@ -524,9 +524,9 @@ def do_main_program():
             
             # find the user
             try:
-                sql = 'SELECT user_id, pwhash, groups, hashfn ' \
+                sql = 'SELECT `user_id`, `pwhash`, `groups`, `hashfn` ' \
                       'FROM %smumble_mumbleuser ' \
-                      'WHERE username = %%s' % cfg.database.prefix
+                      'WHERE `username` = %%s' % cfg.database.prefix
                 cur = threadDB.execute(sql, [name])
             except threadDbException:
                 return (FALL_THROUGH, None, None)
@@ -542,9 +542,9 @@ def do_main_program():
             
             # check for display name
             try:
-                sql = 'SELECT display_name, user_id ' \
+                sql = 'SELECT `display_name`, `user_id` ' \
                       'FROM %smumble_mumbleuser ' \
-                      'WHERE username = %%s' % cfg.database.prefix
+                      'WHERE `username` = %%s' % cfg.database.prefix
                 cur = threadDB.execute(sql, [name])
                 res = cur.fetchone()
                 cur.close()
