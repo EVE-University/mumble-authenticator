@@ -670,9 +670,9 @@ def do_main_program():
                 if id > cfg.user.id_offset:
                     bbid = id - cfg.user.id_offset
                     sql = "SELECT REPLACE('%s', '{charid}', eec.character_id) " \
-                          'FROM %seveonline_evecharacter AS `eec`, authentication_userprofile AS `aup` ' \
+                          'FROM %seveonline_evecharacter AS `eec`, %sauthentication_userprofile AS `aup` ' \
                           'WHERE (aup.user_id = %%s) AND (aup.main_character_id = eec.id)' \
-                              % (cfg.user.ccp_avatar_url, cfg.database.prefix)
+                              % (cfg.user.ccp_avatar_url, cfg.database.prefix, cfg.database.prefix)
                 cur = threadDB.execute(sql, [bbid])
             except threadDbException:
                 debug('idToTexture %d -> DB error for query "%s", fall through', id, sql)
