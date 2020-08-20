@@ -45,6 +45,13 @@ import sys
 import Ice
 
 try:
+    from urllib.request import urlopen
+    from urllib.parse import urlparse
+except ImportError:  # python 3 renamed this
+    from urlparse import urlparse
+    from urllib import urlopen
+
+try:
     import thread
 except ImportError:  # python 3 depreciated this
     import _thread as thread
@@ -104,7 +111,9 @@ default = {'database': (('lib', str, 'MySQLdb'),
                         ('port', int, 3306)),
 
            'user': (('id_offset', int, 1000000000),
-                    ('reject_on_error', x2bool, True)),
+                    ('reject_on_error', x2bool, True), 
+                    ('avatar_enable', x2bool, False),
+                    ('ccp_avatar_url', str, '')),
 
            'ice': (('host', str, '127.0.0.1'),
                    ('port', int, 6502),
@@ -650,11 +659,62 @@ def do_main_program():
             """
             Gets called to get the corresponding texture for a user
             """
-
             FALL_THROUGH = ""
+            
+            if not cfg.user.avatar_enable:
+                debug('idToTexture %d -> avatar display disabled, fall through', id)
+                return FALL_THROUGH
+                
+            # Otherwise get the CCP character ID from AAuth DB.
+            try:
+                if id > cfg.user.id_offset:
+                    bbid = id - cfg.user.id_offset
+                    sql = "SELECT REPLACE('%s', '{charid}', eec.character_id) " \
+                          'FROM %seveonline_evecharacter AS `eec`, authentication_userprofile AS `aup` ' \
+                          'WHERE (aup.user_id = %%s) AND (aup.main_character_id = eec.id)' \
+                              % (cfg.user.ccp_avatar_url, cfg.database.prefix)
+                cur = threadDB.execute(sql, [bbid])
+            except threadDbException:
+                debug('idToTexture %d -> DB error for query "%s", fall through', id, sql)
+                return FALL_THROUGH
+                
+            res = cur.fetchone()
+            cur.close()
+            if not res:
+                debug('idToTexture %d -> user unknown, fall through', id)
+                return FALL_THROUGH
+            avatar_file = res[0]
 
-            debug('idToTexture "%s" -> fall through', id)
-            return FALL_THROUGH
+            # If we found a character ID, avatar_file contains image URL.
+            if avatar_file:
+
+                # Now check if we have the avatar cached.
+                if avatar_file in self.texture_cache:
+                    debug('idToTexture %d -> cached avatar returned: "%s"', id, avatar_file)
+                    return self.texture_cache[avatar_file]
+
+                # Not cached? Try to retrieve from CCP image server.
+                # Should work under Python 2.4+ and 3.x.
+                try:
+                    debug('idToTexture %d -> try file "%s"', id, avatar_file)
+                    handle = urlopen(avatar_file)
+
+                except (IOError, Exception):
+                    e = sys.exc_info()[1]      # Python 2.4 compatible
+                    debug('idToTexture %d -> image download for "%s" failed: "%s", fall through', id, avatar_file, str(e))
+                    return FALL_THROUGH
+                else:
+                    file = handle.read()
+                    handle.close()
+                    
+                # Cache resulting avatar by file address and return image.
+                self.texture_cache[avatar_file] = file
+                debug('idToTexture %d -> avatar from "%s" retrieved and returned', id, avatar_file)
+                return self.texture_cache[avatar_file]
+
+            else:
+                debug('idToTexture %d -> empty avatar_file, final fall through', id)
+                return FALL_THROUGH
 
         @fortifyIceFu(-2)
         @checkSecret

@@ -15,6 +15,10 @@ port       = 3306
 id_offset       = 1000000000
 ;Reject users if the authenticator experiences an internal error during authentication
 reject_on_error = True
+;If enabled, textures are automatically set as player's EvE avatar for use on overlay.
+avatar_enable = False
+;Get EvE avatar images from this location. {charid} will be filled in.
+ccp_avatar_url = https://images.evetech.net/characters/{charid}/portrait?size=32
 
 ;Ice configuration
 [ice]
