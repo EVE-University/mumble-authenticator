@@ -79,6 +79,9 @@ except ImportError:  # python 2.4 compat
 
 from passlib.hash import bcrypt_sha256
 
+__version__ = "1.0.0"
+__branch__ = "AA Base"
+
 
 def eprint(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
@@ -816,7 +819,7 @@ def do_main_program():
     #
     # --- Start of authenticator
     #
-    info('Starting AllianceAuth mumble authenticator')
+    info('Starting AllianceAuth Mumble authenticator V:%s - %s' % (__version__, __branch__))
     initdata = Ice.InitializationData()
     initdata.properties = Ice.createProperties([], initdata.properties)
     for prop, val in cfg.iceraw:
