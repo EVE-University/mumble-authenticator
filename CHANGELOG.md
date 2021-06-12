@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 Targeted against Mumble 1.3.4
 
 
-## Added
+### Added
 - Added an Idle/AFK Handler
 - Client Version/Release and connection/disconnection timestamps for Authenticated Users
 
