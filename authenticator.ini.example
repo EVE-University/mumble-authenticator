@@ -1,58 +1,74 @@
-;Database configuration
+; Database configuration
 [database]
-;Only tested with MySQL at the moment
+; Only tested with MySQL at the moment
 lib        = MySQLdb
 name       = alliance_auth
 user       = allianceserver
 password   = password
-prefix     = 
+prefix     =
 host       = 127.0.0.1
 port       = 3306
 
-;Player configuration
+
+; Player configuration
 [user]
-;If you do not already know what it is just leave it as it is
+; If you do not already know what it is just leave it as it is
 id_offset       = 1000000000
-;Reject users if the authenticator experiences an internal error during authentication
+
+; Reject users if the authenticator experiences an internal error during authentication
 reject_on_error = True
-;If enabled, textures are automatically set as player's EvE avatar for use on overlay.
+
+; If enabled, textures are automatically set as player's EvE avatar for use on overlay.
 avatar_enable = False
-;Get EvE avatar images from this location. {charid} will be filled in.
+
+; Get EvE avatar images from this location. {charid} will be filled in.
 ccp_avatar_url = https://images.evetech.net/characters/{charid}/portrait?size=32
 
-;Ice configuration
+
+; Ice configuration
 [ice]
 host            = 127.0.0.1
 port            = 6502
-slice           = Murmur.ice
+slice           = /home/allianceserver/mumble-authenticator/Murmur.ice
 secret          =
 watchdog        = 30
 
-;Murmur configuration
+
+; Murmur configuration
 [murmur]
-;List of virtual server IDs
+; List of virtual server IDs
 servers      = 1
 
-;Logging configuration
+
+; Logging configuration
 [log]
 ; Available loglevels: 10 = DEBUG (default) | 20 = INFO | 30 = WARNING | 40 = ERROR
 level   =
-file    = authenticator.log
+
+; Log file
+file    = /home/allianceserver/myauth/log/authenticator.log
+
 
 [iceraw]
 Ice.ThreadPool.Server.Size = 5
 
+
 [idlerhandler]
-;An AFK or Idle handler to move people to a set "AFK" Channel
-;Enable the Feature
+; An AFK or Idle handler to move people to a set "AFK" Channel
+; Enable the Feature
 enabled = False
-;Mumble idlesecs Threshold (Seconds) until a user is considered Idle, 
+
+; Mumble idlesecs Threshold (Seconds) until a user is considered Idle,
 time = 3600
-;Interval(Seconds) to run the Idler Handler at
+
+; Interval(Seconds) to run the Idler Handler at
 interval = 60
-;Channel to move Idlers to
+
+; Channel to move Idlers to
 channel = 1
-;Channels for IdlerHandler to Ignore, Comma separated channel IDs, denylist overwrites allowlist
+
+; Channels for IdlerHandler to Ignore, Comma separated channel IDs, denylist overwrites allowlist
 denylist = []
-;Channels for IdlerHandler to Process, Comma separated channel IDs
+
+; Channels for IdlerHandler to Process, Comma separated channel IDs
 allowlist = []
