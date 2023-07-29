@@ -101,7 +101,8 @@ default = {'database': (('lib', str, 'MySQLdb'),
                         ('password', str, 'password'),
                         ('prefix', str, ''),
                         ('host', str, '127.0.0.1'),
-                        ('port', int, 3306)),
+                        ('port', int, 3306),
+                        ('connect_timeout', int, 15)),
 
            'user': (('id_offset', int, 1000000000),
                     ('reject_on_error', x2bool, True),
@@ -225,6 +226,7 @@ class threadDB(object):
                                  user=cfg.database.user,
                                  passwd=cfg.database.password,
                                  db=cfg.database.name,
+                                 connect_timeout=cfg.database.connect_timeout,
                                  charset='utf8')
                 # Transactional engines like InnoDB initiate a transaction even
                 # on SELECTs-only.
@@ -407,7 +409,7 @@ def do_main_program():
             Tries reapplies all callbacks to make sure the authenticator
             survives server restarts and disconnects.
             """
-            # debug('Watchdog run')
+            debug('Watchdog run')
 
             try:
                 if not self.attachCallbacks(quiet=not self.failedWatch):
@@ -535,6 +537,7 @@ def do_main_program():
             self.app = app
 
         def userConnected(self, user, current=None):
+            debug("User %s connected", user.name)
             try:
                 sql = 'UPDATE %smumble_mumbleuser ' \
                       'SET `release` = %%s, `version` = %%s, `last_connect` = %%s ' \
@@ -550,6 +553,7 @@ def do_main_program():
                 error(e)
 
         def userDisconnected(self, user, current=None):
+            debug("User %s diconnected", user.name)
             try:
                 sql = 'UPDATE %smumble_mumbleuser ' \
                       'SET `last_disconnect` = %%s ' \
@@ -597,6 +601,7 @@ def do_main_program():
                 return (FALL_THROUGH, None, None)
 
             # find the user
+            debug("Searching for user %s", name)
             try:
                 sql = 'SELECT `user_id`, `pwhash`, `groups`, `hashfn` ' \
                       'FROM %smumble_mumbleuser ' \
@@ -616,6 +621,7 @@ def do_main_program():
             uid, upwhash, ugroups, uhashfn = res
 
             # check for display name
+            debug("Getting display name for user %s", name)
             try:
                 sql = 'SELECT `display_name`, `user_id` ' \
                       'FROM %smumble_mumbleuser ' \
@@ -678,6 +684,7 @@ def do_main_program():
                 debug('nameToId SuperUser -> forced fall through')
                 return FALL_THROUGH
 
+            debug("Name %s to ID", name)
             try:
                 sql = 'SELECT user_id FROM %smumble_mumbleuser WHERE username = %%s' % cfg.database.prefix
                 cur = threadDB.execute(sql, [name])
@@ -707,6 +714,7 @@ def do_main_program():
             bbid = id - cfg.user.id_offset
 
             # Fetch the user from the database
+            debug("ID %s to Name", id)
             try:
                 sql = 'SELECT username FROM %smumble_mumbleuser WHERE user_id = %%s' % cfg.database.prefix
                 cur = threadDB.execute(sql, [bbid])
@@ -742,6 +750,7 @@ def do_main_program():
             try:
                 if id > cfg.user.id_offset:
                     bbid = id - cfg.user.id_offset
+                    debug("Updating user id %s avatar", id)
                     sql = "SELECT REPLACE('%s', '{charid}', eec.character_id) " \
                           'FROM %seveonline_evecharacter AS `eec`,' \
                           '%sauthentication_userprofile AS `aup` ' \
@@ -827,6 +836,7 @@ def do_main_program():
                 filter = '%'
 
             try:
+                debug("Get registered users by filter '%s'", filter)
                 sql = 'SELECT user_id, username FROM %smumble_mumbleuser WHERE username LIKE %%s' % cfg.database.prefix
                 cur = threadDB.execute(sql, [filter])
             except threadDbException:
