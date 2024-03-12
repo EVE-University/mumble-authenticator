@@ -1,3 +1,4 @@
 bcrypt
+mysqlclient
 passlib
 zeroc-ice
