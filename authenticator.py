@@ -112,7 +112,8 @@ default = {'database': (('lib', str, 'MySQLdb'),
                    ('port', int, 6502),
                    ('slice', str, 'Murmur.ice'),
                    ('secret', str, ''),
-                   ('watchdog', int, 30)),
+                   ('watchdog', int, 30),
+                   ('endpoint', str, '127.0.0.1')),
 
            'iceraw': None,
 
@@ -347,7 +348,7 @@ def do_main_program():
             self.meta = Murmur.MetaPrx.uncheckedCast(base)
 
             adapter = ice.createObjectAdapterWithEndpoints('Callback.Client',
-                                                           'tcp -h %s' % cfg.ice.host)
+                                                           'tcp -h %s' % cfg.ice.endpoint)
             adapter.activate()
 
             metacbprx = adapter.addWithUUID(metaCallback(self))

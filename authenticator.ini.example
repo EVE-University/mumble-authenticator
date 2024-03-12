@@ -32,6 +32,7 @@ port            = 6502
 slice           = /home/allianceserver/mumble-authenticator/Murmur.ice
 secret          =
 watchdog        = 30
+endpoint        = 127.0.0.1
 
 
 ; Murmur configuration
