@@ -73,3 +73,10 @@ denylist = []
 
 ; Channels for IdlerHandler to Process, Comma separated channel IDs
 allowlist = []
+
+[healthcheck]
+; Must be a valid MumbleUsers username
+username = Example_Username
+
+; Password is optional if you only want to test username existence
+; password = Password
