@@ -117,7 +117,7 @@ default = {'database': (('lib', str, 'MySQLdb'),
 
            'iceraw': None,
 
-           'murmur': (('servers', lambda x: map(int, x.split(',')), []),),
+           'murmur': (('servers', lambda x: list(map(int, x.split(','))), []),),
            'glacier': (('enabled', x2bool, False),
                        ('user', str, 'allianceserver'),
                        ('password', str, 'password'),
