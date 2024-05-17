@@ -21,7 +21,7 @@ default_config = {
         ("slice", str, "Murmur.ice"),
         ("secret", str, ""),
     ),
-    "murmur": (("servers", lambda x: map(int, x.split(",")), []),),
+    "murmur": (("servers", lambda x: list(map(int, x.split(",")), [])),),
     "healthcheck": (
         ("username", str, "healthcheck_user"),
         ("password", str, ""),
