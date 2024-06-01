@@ -110,7 +110,7 @@ default = {'database': (('lib', str, 'MySQLdb'),
 
            'ice': (('host', str, '127.0.0.1'),
                    ('port', int, 6502),
-                   ('slice', str, 'Murmur.ice'),
+                   ('slice', str, 'slices/murmur-1.5.ice'),
                    ('secret', str, ''),
                    ('watchdog', int, 30),
                    ('endpoint', str, '127.0.0.1')),
@@ -302,7 +302,13 @@ def do_main_program():
     else:
         slicedir = ['-I' + slicedir]
     Ice.loadSlice('', slicedir + [cfg.ice.slice])
-    import Murmur
+    # ICE Slice module was changed from Murmur to MumbleServer in 1.5
+    try:
+        import Murmur
+        debug("Using pre-1.5 slice.")
+    except ImportError:
+        import MumbleServer as Murmur
+        debug("Using post-1.5 slice.")
 
     class allianceauthauthenticatorApp(Ice.Application):
         def run(self, args):
